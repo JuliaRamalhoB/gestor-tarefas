@@ -1,11 +1,28 @@
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+//import java.util.List;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException{
         ArrayList<Tarefa> tarefas = new ArrayList<>();
         Scanner scanner = new Scanner(System.in);
+
+        ObjectMapper mapper = new ObjectMapper();
+        File ficheiro = new File("tarefas.json");
+
+        if (ficheiro.exists() && ficheiro.length() > 0) {
+            tarefas = mapper.readValue(
+                ficheiro,
+                new TypeReference<ArrayList<Tarefa>>() {}
+            );
+        }
         
+        
+
         while (true) {
             System.out.println("Escolha uma opção: \n1 - Criar tarefa \n2 - Listar tarefas \n3 - Mudar estado da tarefa \n4 - Sair");
             String entradaMenu = scanner.nextLine();
@@ -19,13 +36,13 @@ public class Main {
 
             switch (menu) {
                 case 1:
-                    adicionarTarefa(scanner, tarefas);
+                    adicionarTarefa(mapper,ficheiro, scanner, tarefas);
                     break;
                 case 2:
                     listarTarefas(tarefas);
                     break;
                 case 3:
-                    mudarEstadoTar(scanner, tarefas);
+                    mudarEstadoTar(mapper,ficheiro, scanner, tarefas);
                     
                     break;
                 case 4:
@@ -41,7 +58,8 @@ public class Main {
         
     }
     //Métodos
-    public static void adicionarTarefa(Scanner scanner, ArrayList<Tarefa> tarefas){
+    public static void adicionarTarefa(ObjectMapper mapper, File ficheiro, Scanner scanner, ArrayList<Tarefa> tarefas) throws IOException{
+        //ObjectMapper mapper = new ObjectMapper();
         while (true) {
             System.out.println("Digite o título");
             String titulo = scanner.nextLine();
@@ -51,6 +69,7 @@ public class Main {
             try {
                 Tarefa t = new Tarefa(titulo, descricao);
                 tarefas.add(t);
+                mapper.writeValue(ficheiro, tarefas);
                 System.out.println("Tarefa registrada");
                 break;
             } catch (IllegalArgumentException e) {
@@ -59,10 +78,12 @@ public class Main {
         }         
     }
 
-    public static void listarTarefas(ArrayList<Tarefa> tarefas){
+    public static void listarTarefas(ArrayList<Tarefa> tarefas) throws IOException{
+
         if (tarefas.isEmpty()) {
             System.out.println("Não há tarefas cadastradas.");
         } else {
+            System.out.println("-----------------------");
             for (Tarefa t : tarefas) {
                 System.out.println(t);
                 System.out.println("-----------------------");
@@ -70,8 +91,9 @@ public class Main {
         }
     }
 
-    public static void mudarEstadoTar(Scanner scanner, ArrayList<Tarefa> tarefas){
-        
+    public static void mudarEstadoTar(ObjectMapper mapper, File ficheiro, Scanner scanner, ArrayList<Tarefa> tarefas) throws IOException{
+        //ObjectMapper mapper = new ObjectMapper();
+
         for(Tarefa t : tarefas){
             System.out.println(t.getTitulo());
             System.out.println("----------");
@@ -88,6 +110,7 @@ public class Main {
 
         if (tarefaEncontrada == null) {
             System.out.println("Tarefa não encontrada.");
+            return;
         }
 
         System.out.println("O estado atual da tarefa " + tarefaEncontrada.getTitulo() + " é: " + tarefaEncontrada.getEstado());
@@ -104,7 +127,9 @@ public class Main {
                     break;
                 default:
                     System.out.println("Opção inválida.");
+            
             }
+            mapper.writeValue(ficheiro, tarefas);
         } catch (NumberFormatException e) {
             System.out.println("Opção inválida.");
         }

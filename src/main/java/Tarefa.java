@@ -1,4 +1,6 @@
-//import java.util.Scanner;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 
 public class Tarefa {
     private String titulo;
@@ -11,8 +13,9 @@ public class Tarefa {
         CONCLUIDA;
     }
 
+    @JsonCreator
     //construtor
-    public Tarefa(String titulo, String descricao){
+    public Tarefa(@JsonProperty("titulo") String titulo, @JsonProperty("descricao") String descricao){
         setTitulo(titulo);
         setDescricao(descricao);
         this.estado = Estado.PENDENTE;
