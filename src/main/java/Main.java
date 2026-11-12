@@ -24,7 +24,7 @@ public class Main {
         
 
         while (true) {
-            System.out.println("Escolha uma opção: \n1 - Criar tarefa \n2 - Listar tarefas \n3 - Mudar estado da tarefa \n4 - Sair");
+            System.out.println("Escolha uma opção: \n1 - Criar tarefa \n2 - Listar tarefas \n3 - Mudar estado da tarefa \n4 - Excluir Tarefa \n5 - Sair");
             String entradaMenu = scanner.nextLine();
             int menu;
             try {
@@ -46,6 +46,9 @@ public class Main {
                     
                     break;
                 case 4:
+                    excluirTarefa(mapper, ficheiro, scanner, tarefas);
+                    break;
+                case 5:
                     scanner.close();
                     return;
                 default:
@@ -133,5 +136,32 @@ public class Main {
         } catch (NumberFormatException e) {
             System.out.println("Opção inválida.");
         }
+    }
+
+    public static void excluirTarefa(ObjectMapper mapper, File ficheiro, Scanner scanner, ArrayList<Tarefa> tarefas) throws IOException{
+        System.out.println("Esta é a lista de tarefas no momento:");
+        for(Tarefa t : tarefas){
+            System.out.println(t.getTitulo());
+        }
+        while (true) {
+            System.out.println("Nome da que quer excluir: ");
+            String tarExc = scanner.nextLine();
+            boolean tEncontrada = false;
+            
+            for(Tarefa t : tarefas){
+                if(t.getTitulo().equals(tarExc)){
+                    tarefas.remove(t);
+                    tEncontrada = true;
+                    mapper.writeValue(ficheiro, tarefas);
+                    break;
+                }
+            }
+            if(!tEncontrada){
+                System.out.println("Tarefa não encontrada, digite novamente: ");
+                continue;
+            }
+            break;
+        }
+            
     }
 }
