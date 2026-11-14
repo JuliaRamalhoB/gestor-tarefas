@@ -6,11 +6,18 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws IOException{
-        ArrayList<Tarefa> tarefas = new ArrayList<>();
         Scanner scanner = new Scanner(System.in);
 
         RepositorioTarefas repositorio = new RepositorioTarefas(new File("tarefas.json"));
-        tarefas = repositorio.carregar();
+
+        ArrayList<Tarefa> tarefas;
+        try {
+            tarefas = repositorio.carregar();
+        } catch (IOException e) {
+            System.out.println("Não foi possível ler o ficheiro tarefas.json. Está corrompido ou ilegível.");
+            System.out.println("O ficheiro não foi alterado. Corrija-o ou mova-o e tente de novo.");
+            return;
+        }
 
         while (true) {
             System.out.println("Escolha uma opção: \n1 - Criar tarefa \n2 - Listar tarefas \n3 - Mudar estado da tarefa \n4 - Excluir Tarefa \n5 - Sair");
