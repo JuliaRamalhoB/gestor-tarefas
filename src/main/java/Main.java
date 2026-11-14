@@ -1,26 +1,16 @@
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
+
 
 public class Main {
     public static void main(String[] args) throws IOException{
         ArrayList<Tarefa> tarefas = new ArrayList<>();
         Scanner scanner = new Scanner(System.in);
 
-        ObjectMapper mapper = new ObjectMapper();
-        File ficheiro = new File("tarefas.json");
-
-        if (ficheiro.exists() && ficheiro.length() > 0) {
-            tarefas = mapper.readValue(
-                ficheiro,
-                new TypeReference<ArrayList<Tarefa>>() {}
-            );
-        }
-        
-        
+        RepositorioTarefas repositorio = new RepositorioTarefas(new File("tarefas.json"));
+        tarefas = repositorio.carregar();
 
         while (true) {
             System.out.println("Escolha uma opção: \n1 - Criar tarefa \n2 - Listar tarefas \n3 - Mudar estado da tarefa \n4 - Excluir Tarefa \n5 - Sair");
@@ -35,17 +25,17 @@ public class Main {
 
             switch (menu) {
                 case 1:
-                    adicionarTarefa(mapper,ficheiro, scanner, tarefas);
+                    adicionarTarefa(scanner, tarefas, repositorio);
                     break;
                 case 2:
                     listarTarefas(tarefas);
                     break;
                 case 3:
-                    mudarEstadoTar(mapper,ficheiro, scanner, tarefas);
+                    mudarEstadoTar(scanner, tarefas, repositorio);
                     
                     break;
                 case 4:
-                    excluirTarefa(mapper, ficheiro, scanner, tarefas);
+                    excluirTarefa(scanner, tarefas, repositorio);
                     break;
                 case 5:
                     scanner.close();
@@ -60,8 +50,7 @@ public class Main {
         
     }
     //Métodos
-    public static void adicionarTarefa(ObjectMapper mapper, File ficheiro, Scanner scanner, ArrayList<Tarefa> tarefas) throws IOException{
-        //ObjectMapper mapper = new ObjectMapper();
+    public static void adicionarTarefa(Scanner scanner, ArrayList<Tarefa> tarefas, RepositorioTarefas repositorio) throws IOException{
         while (true) {
             System.out.println("Digite o título");
             String titulo = scanner.nextLine().trim();
@@ -74,7 +63,7 @@ public class Main {
             try {
                 Tarefa t = new Tarefa(titulo, descricao);
                 tarefas.add(t);
-                mapper.writeValue(ficheiro, tarefas);
+                repositorio.guardar(tarefas);
                 System.out.println("Tarefa registrada");
                 break;
             } catch (IllegalArgumentException e) {
@@ -96,8 +85,7 @@ public class Main {
         }
     }
 
-    public static void mudarEstadoTar(ObjectMapper mapper, File ficheiro, Scanner scanner, ArrayList<Tarefa> tarefas) throws IOException{
-        //ObjectMapper mapper = new ObjectMapper();
+    public static void mudarEstadoTar(Scanner scanner, ArrayList<Tarefa> tarefas, RepositorioTarefas repositorio) throws IOException{
 
         if(tarefas.isEmpty()){
             System.out.println("A lista está vazia, não há mudanças a serem feitas");
@@ -132,11 +120,11 @@ public class Main {
             switch (opcao) {
                 case 1:
                     tarefaEncontrada.comecarTarefa();
-                    mapper.writeValue(ficheiro, tarefas);
+                    repositorio.guardar(tarefas);
                     break;
                 case 2:
                     tarefaEncontrada.concluirTarefa();
-                    mapper.writeValue(ficheiro, tarefas);
+                    repositorio.guardar(tarefas);
                     break;
                 default:
                     System.out.println("Opção inválida.");
@@ -147,7 +135,7 @@ public class Main {
         }
     }
 
-    public static void excluirTarefa(ObjectMapper mapper, File ficheiro, Scanner scanner, ArrayList<Tarefa> tarefas) throws IOException{
+    public static void excluirTarefa(Scanner scanner, ArrayList<Tarefa> tarefas, RepositorioTarefas repositorio) throws IOException{
         if(tarefas.isEmpty()){
             System.out.println("Não há tarefa registrada, não há exclusão que possa ser feita.");
             return;
@@ -165,7 +153,8 @@ public class Main {
             Tarefa tarefaEncontrada = procurarTarefa(tarefas, tarExc);
             if (tarefaEncontrada != null) {
                 tarefas.remove(tarefaEncontrada);
-                mapper.writeValue(ficheiro, tarefas);
+                repositorio.guardar(tarefas);
+                System.out.println("Tarefa excluida! \n-----------------");
                 break;
             }
             System.out.println("Tarefa não encontrada, digite novamente: ");
