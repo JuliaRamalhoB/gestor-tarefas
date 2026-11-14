@@ -64,8 +64,11 @@ public class Main {
         //ObjectMapper mapper = new ObjectMapper();
         while (true) {
             System.out.println("Digite o título");
-            String titulo = scanner.nextLine();
-            //depois tem de verificar pra saber se ja tem uma tarefa com o come igual
+            String titulo = scanner.nextLine().trim();
+            if (procurarTarefa(tarefas, titulo) != null) {
+                System.out.println("Já tem uma tarefa com este título, digite um novo");
+                continue;
+            }
             System.out.println("Digite a descrição");
             String descricao = scanner.nextLine();
             try {
@@ -80,7 +83,7 @@ public class Main {
         }         
     }
 
-    public static void listarTarefas(ArrayList<Tarefa> tarefas) throws IOException{
+    public static void listarTarefas(ArrayList<Tarefa> tarefas){
 
         if (tarefas.isEmpty()) {
             System.out.println("Não há tarefas cadastradas.");
@@ -96,71 +99,85 @@ public class Main {
     public static void mudarEstadoTar(ObjectMapper mapper, File ficheiro, Scanner scanner, ArrayList<Tarefa> tarefas) throws IOException{
         //ObjectMapper mapper = new ObjectMapper();
 
+        if(tarefas.isEmpty()){
+            System.out.println("A lista está vazia, não há mudanças a serem feitas");
+            return;
+        }
+
         for(Tarefa t : tarefas){
             System.out.println(t.getTitulo());
             System.out.println("----------");
         }
-        System.out.println("Digite o título da tarefa que quer acessar");
-        String nomeT = scanner.nextLine();
+        
         Tarefa tarefaEncontrada = null;
-        for (Tarefa t : tarefas) {
-            if (t.getTitulo().equalsIgnoreCase(nomeT)) {
-                tarefaEncontrada = t;
+        while(true){
+            System.out.println("Digite o título da tarefa que quer acessar, (se quiser sair só dar enter):");
+            String nomeT = scanner.nextLine().trim();
+            if(nomeT.isBlank()){
+                return;
+            }
+            
+            tarefaEncontrada = procurarTarefa(tarefas, nomeT);
+
+            if (tarefaEncontrada != null) {
                 break;
             }
+            System.out.println("Tarefa não encontrada tente novamente: ");
         }
-
-        if (tarefaEncontrada == null) {
-            System.out.println("Tarefa não encontrada.");
-            return;
-        }
-
         System.out.println("O estado atual da tarefa " + tarefaEncontrada.getTitulo() + " é: " + tarefaEncontrada.getEstado());
         System.out.println("Opções: \n1 - Em curso \n2 - Concluída");
-        String entradaOpcao = scanner.nextLine();
+        String entradaOpcao = scanner.nextLine().trim();
         try {
             int opcao = Integer.parseInt(entradaOpcao);
             switch (opcao) {
                 case 1:
                     tarefaEncontrada.comecarTarefa();
+                    mapper.writeValue(ficheiro, tarefas);
                     break;
                 case 2:
                     tarefaEncontrada.concluirTarefa();
+                    mapper.writeValue(ficheiro, tarefas);
                     break;
                 default:
                     System.out.println("Opção inválida.");
             
             }
-            mapper.writeValue(ficheiro, tarefas);
         } catch (NumberFormatException e) {
             System.out.println("Opção inválida.");
         }
     }
 
     public static void excluirTarefa(ObjectMapper mapper, File ficheiro, Scanner scanner, ArrayList<Tarefa> tarefas) throws IOException{
+        if(tarefas.isEmpty()){
+            System.out.println("Não há tarefa registrada, não há exclusão que possa ser feita.");
+            return;
+        }
         System.out.println("Esta é a lista de tarefas no momento:");
         for(Tarefa t : tarefas){
             System.out.println(t.getTitulo());
         }
         while (true) {
-            System.out.println("Nome da que quer excluir: ");
-            String tarExc = scanner.nextLine();
-            boolean tEncontrada = false;
-            
-            for(Tarefa t : tarefas){
-                if(t.getTitulo().equals(tarExc)){
-                    tarefas.remove(t);
-                    tEncontrada = true;
-                    mapper.writeValue(ficheiro, tarefas);
-                    break;
-                }
+            System.out.println("Nome da que quer excluir (se deseja sair dê enter): ");
+            String tarExc = scanner.nextLine().trim();
+            if(tarExc.isBlank()){
+                return ;
             }
-            if(!tEncontrada){
-                System.out.println("Tarefa não encontrada, digite novamente: ");
-                continue;
+            Tarefa tarefaEncontrada = procurarTarefa(tarefas, tarExc);
+            if (tarefaEncontrada != null) {
+                tarefas.remove(tarefaEncontrada);
+                mapper.writeValue(ficheiro, tarefas);
+                break;
             }
-            break;
+            System.out.println("Tarefa não encontrada, digite novamente: ");
         }
             
+    }
+    public static Tarefa procurarTarefa(ArrayList<Tarefa> tarefas, String titulo) {
+        for (Tarefa t : tarefas) {
+            if (t.getTitulo().equalsIgnoreCase(titulo)) {
+                return t;
+            }
+        }
+        return null;
     }
 }
