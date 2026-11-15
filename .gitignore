@@ -4,3 +4,5 @@ out/
 *.iml
 .vscode/
 tarefas.txt
+target/
+tarefas.json
