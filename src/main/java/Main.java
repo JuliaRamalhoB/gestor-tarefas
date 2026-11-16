@@ -14,6 +14,7 @@ public class Main {
         try {
             tarefas = repositorio.carregar();
         } catch (IOException e) {
+            System.out.println("Detalhe: " + e.getMessage());
             System.out.println("Não foi possível ler o ficheiro tarefas.json. Está corrompido ou ilegível.");
             System.out.println("O ficheiro não foi alterado. Corrija-o ou mova-o e tente de novo.");
             return;
