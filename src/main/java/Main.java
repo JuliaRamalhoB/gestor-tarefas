@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 
+
 public class Main {
     public static void main(String[] args) throws IOException{
         Scanner scanner = new Scanner(System.in);
@@ -176,5 +177,49 @@ public class Main {
             }
         }
         return null;
+    }
+
+    public static void mudarPrioridade(ArrayList<Tarefa> tarefas, Scanner scanner){
+        if(tarefas.size() < 1 ){
+            System.out.println("Não há tarefas para serem modificadas no momento.");
+            return;
+        }
+        System.out.println("Estas são as tarefas do momento:");
+        for( Tarefa t : tarefas){
+            System.out.println(t.getTitulo() + " - " + t.getPrioridade());
+        }
+        System.out.println("Digite o título da que deseja alterar (se deseja sair dê enter):");
+        Tarefa t = null;
+        while (true) {
+            String tarefasEscolhida = scanner.next().trim();
+            if(tarefasEscolhida.isBlank()){
+                return;
+            }
+            t = procurarTarefa(tarefas, tarefasEscolhida);
+            if(t == null){
+                System.out.println("Tarefa não encontrada, tente novamente: ");
+                continue;
+            }
+            break;
+        }
+
+        System.out.println("Opções: \n1 - Média \n2 - Alta");
+        String opcao = scanner.nextLine().trim();
+        try{
+            int opcaoInt = Integer.parseInt(opcao);
+            switch (opcaoInt) {
+                case 1:
+                    t.prioridadeMedia();
+                    break;
+                case 2:
+                    t.prioridadeAlta();
+                    break;
+                default:
+                    break;
+            }
+
+        } catch (NumberFormatException e) {
+            System.out.println("Opção inválida.");
+        }
     }
 }

@@ -6,11 +6,18 @@ public class Tarefa {
     private String titulo;
     private String descricao;
     private Estado estado;
+    private Prioridade prioridade;
 
     public enum Estado {
         PENDENTE,
         EM_CURSO,
         CONCLUIDA;
+    }
+
+    public enum Prioridade{
+        BAIXA,
+        MEDIA,
+        ALTA;
     }
 
     @JsonCreator
@@ -19,6 +26,7 @@ public class Tarefa {
         setTitulo(titulo);
         setDescricao(descricao);
         this.estado = Estado.PENDENTE;
+        this.prioridade = Prioridade.BAIXA;
     }    
 
     //getters
@@ -34,12 +42,20 @@ public class Tarefa {
         return estado;
     }
 
+    public Prioridade getPrioridade(){
+        return prioridade;
+    }
+
     private void setTitulo(String titulo){  
             if(titulo == null || titulo.isBlank()){
                 throw new IllegalArgumentException("O título da tarefa não foi preenchido.");
             }
             this.titulo = titulo;
             
+    }
+
+    public void setPrioridade(Prioridade prioridade){
+        this.prioridade = prioridade; 
     }
 
     private void setDescricao(String descricao){
@@ -55,6 +71,13 @@ public class Tarefa {
 
     public void concluirTarefa(){
         this.estado = Estado.CONCLUIDA;
+    }
+    public void prioridadeMedia(){
+        this.prioridade = Prioridade.MEDIA;
+    }
+
+    public void prioridadeAlta(){
+        this.prioridade = Prioridade.ALTA;
     }
 
     //metodos
