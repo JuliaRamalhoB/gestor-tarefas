@@ -1,3 +1,5 @@
+import java.time.LocalDate;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -7,6 +9,7 @@ public class Tarefa {
     private String descricao;
     private Estado estado;
     private Prioridade prioridade;
+    private LocalDate dataLim;
 
     public enum Estado {
         PENDENTE,
@@ -27,6 +30,7 @@ public class Tarefa {
         setDescricao(descricao);
         this.estado = Estado.PENDENTE;
         this.prioridade = Prioridade.BAIXA;
+        this.dataLim = null;
     }    
 
     //getters
@@ -44,6 +48,10 @@ public class Tarefa {
 
     public Prioridade getPrioridade(){
         return prioridade;
+    }
+
+    public LocalDate getDataLimite(){
+        return dataLim;
     }
 
     private void setTitulo(String titulo){  
@@ -64,6 +72,10 @@ public class Tarefa {
         }
         this.descricao = descricao;
     }
+
+    public void setDataLimite(LocalDate datalim){
+        this.dataLim = datalim;
+    }
     
     public void comecarTarefa(){
         this.estado = Estado.EM_CURSO;
@@ -79,13 +91,17 @@ public class Tarefa {
     public void prioridadeAlta(){
         this.prioridade = Prioridade.ALTA;
     }
+    
 
     //metodos
 
-    public String toString(){
-        return "Titulo: " + this.titulo +
-         "\nDescrição: " + this.descricao + 
-         "\nEstado: " + this.estado;
+    public String toString() {
+        String data = dataLim == null ? "Sem data" : dataLim.toString();
 
-    }
+        return  "Título: " + titulo +
+                "\nDescrição: " + descricao +
+                "\nEstado: " + estado +
+                "\nPrioridade: " + prioridade +
+                "\nData limite: " + data;
+}
 }

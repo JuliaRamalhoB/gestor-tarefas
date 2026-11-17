@@ -1,7 +1,10 @@
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.time.format.DateTimeParseException;
+
 
 
 
@@ -22,7 +25,7 @@ public class Main {
         }
 
         while (true) {
-            System.out.println("Escolha uma opção: \n1 - Criar tarefa \n2 - Listar tarefas \n3 - Mudar estado da tarefa \n4 - Excluir Tarefa \n5 - Sair");
+            System.out.println("Escolha uma opção: \n1 - Criar tarefa \n2 - Listar tarefas \n3 - Mudar estado da tarefa \n4 - Excluir Tarefa \n5 - Definir data de tarefa \n6 - Sair");
             String entradaMenu = scanner.nextLine();
             int menu;
             try {
@@ -41,12 +44,14 @@ public class Main {
                     break;
                 case 3:
                     mudarEstadoTar(scanner, tarefas, repositorio);
-                    
                     break;
                 case 4:
                     excluirTarefa(scanner, tarefas, repositorio);
                     break;
                 case 5:
+                    addouAlterarDataLim(tarefas, scanner, repositorio);
+                    break;
+                case 6: 
                     scanner.close();
                     return;
                 default:
@@ -223,5 +228,45 @@ public class Main {
         } catch (NumberFormatException e) {
             System.out.println("Opção inválida.");
         }
+    }
+
+    public static void addouAlterarDataLim(ArrayList<Tarefa> tarefas, Scanner scanner, RepositorioTarefas repositorio) throws IOException{
+        if(tarefas.size() < 1 || tarefas.isEmpty()){
+            System.out.println("Não há tarefas listadas, não há mudança possível.");
+            return;
+        }
+        
+        for(Tarefa t : tarefas){
+            System.out.println(t.getTitulo() + " -- " + (t.getDataLimite() != null ? t.getDataLimite() : "Sem data"));
+        }
+        System.out.println("Digite a que quer modificar (se deseja sair, só dê enter):");
+        Tarefa tarEsc = null;
+        while(true){
+            String t = scanner.nextLine().trim();
+            if(t.isBlank()){
+                return;
+            }
+            tarEsc = procurarTarefa(tarefas, t);
+            if (tarEsc == null) {
+                System.out.println("Título inválido, tente novamente:");
+                continue;                
+            }
+            break;
+        }
+        while (true) {
+            try{
+                System.out.println("Qual a data que quer definir (AAAA-MM-DD):");
+                String textoData = scanner.nextLine(); 
+                LocalDate data = LocalDate.parse(textoData);
+                tarEsc.setDataLimite(data);
+                break;
+            } catch (DateTimeParseException e) {
+                System.out.println("Data inválida! Certifique-se de usar o formato AAAA-MM-DD (ex: 2026-11-17).");
+            }
+        }
+        
+        
+
+        repositorio.guardar(tarefas);
     }
 }

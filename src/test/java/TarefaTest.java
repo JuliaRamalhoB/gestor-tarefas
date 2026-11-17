@@ -1,4 +1,6 @@
 
+import java.time.LocalDate;
+
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -68,6 +70,15 @@ class TarefaTest {
 
         tarefa.prioridadeAlta();
         assertEquals(Tarefa.Prioridade.ALTA, tarefa.getPrioridade());
+    }
 
+    @Test 
+    void definirData(){
+        Tarefa tarefa = new Tarefa("Estudar Java", "Estudar JUnit");
+        LocalDate dataLimite = LocalDate.of(2026, 11, 20);
+
+        tarefa.setDataLimite(dataLimite);
+
+        assertEquals(dataLimite, tarefa.getDataLimite());
     }
 }
