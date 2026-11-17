@@ -1,6 +1,5 @@
 
 import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class TarefaTest {
@@ -62,5 +61,13 @@ class TarefaTest {
             "A descrição não foi preenchida",
             excecao.getMessage()
         );
+    }
+    @Test 
+    void mudarPrioridadeParaAlta(){
+        Tarefa tarefa = new Tarefa("Estudar Java", "Estudar JUnit");
+
+        tarefa.prioridadeAlta();
+        assertEquals(Tarefa.Prioridade.ALTA, tarefa.getPrioridade());
+
     }
 }

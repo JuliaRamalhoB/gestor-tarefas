@@ -179,7 +179,7 @@ public class Main {
         return null;
     }
 
-    public static void mudarPrioridade(ArrayList<Tarefa> tarefas, Scanner scanner){
+    public static void mudarPrioridade(ArrayList<Tarefa> tarefas, Scanner scanner, RepositorioTarefas repositorio) throws IOException{
         if(tarefas.size() < 1 ){
             System.out.println("Não há tarefas para serem modificadas no momento.");
             return;
@@ -210,14 +210,16 @@ public class Main {
             switch (opcaoInt) {
                 case 1:
                     t.prioridadeMedia();
+                    repositorio.guardar(tarefas);
+                    
                     break;
                 case 2:
                     t.prioridadeAlta();
+                    repositorio.guardar(tarefas);
                     break;
                 default:
                     break;
             }
-
         } catch (NumberFormatException e) {
             System.out.println("Opção inválida.");
         }
